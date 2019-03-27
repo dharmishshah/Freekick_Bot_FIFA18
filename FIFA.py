@@ -5,12 +5,16 @@ from PIL import Image
 from grabscreen import grab_screen
 from directkeys import *
 
+
+
 #Game class that performs the action grabs screen and restarts the drill.
+
 class FIFA(object):
     reward = 0
 
     def __init__(self):
         self.reset()
+
 
     #observes the game state if the drill is finished the retry button is pressed.
     def observe(self):
@@ -56,6 +60,7 @@ class FIFA(object):
             time.sleep(5)
         else:
             time.sleep(1)
+
         return self.observe()
 
     def reset(self):
