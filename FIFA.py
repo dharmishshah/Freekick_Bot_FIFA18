@@ -4,16 +4,24 @@ import cv2
 from PIL import Image
 from grabscreen import grab_screen
 from directkeys import *
+import ConvolutionalNN as cnn
 
 
 
 #Game class that performs the action grabs screen and restarts the drill.
+
+count = 0
 
 class FIFA(object):
     reward = 0
 
     def __init__(self):
         self.reset()
+
+
+    def game_over(self, action):
+        is_over = True if action in [0, 1] else False
+        return is_over    
 
 
     #observes the game state if the drill is finished the retry button is pressed.
@@ -40,6 +48,46 @@ class FIFA(object):
             time.sleep(2)
             screen = grab_screen(region=None)
             screen = screen
+        state = cnn.get_image_content(screen)
+        return state
+
+    def calculate_rewards(self,action):
+        screen = grab_screen(region=None)
+        crop_img = self.crop_image(screen, 1125, 40, 65, 55)
+        return self.get_reward_by_ocr(crop_img,action) 
+        
+
+    def crop_image(self, image, start_x,start_y, crop_x, crop_y):
+            crop_img = image[start_y:start_y + crop_y, start_x:start_x+crop_x]
+            return crop_img
+
+    def get_reward_by_ocr(self, reward_screen, action):
+        ingame_reward = 0
+        i = Image.fromarray(reward_screen.astype('uint8'), 'RGB')
+        ocr_result = pt.image_to_string(i)
+        try:
+            for c in ocr_result:
+                if not c.isdigit():
+                   raise Exception("invalid score")
+            ingame_reward = int(''.join(c for c in ocr_result if c.isdigit()))
+            temp_reward = ingame_reward
+            print("ingame_reward - " + str(ingame_reward) + " reward - " + str(self.reward))
+            if (ingame_reward - self.reward) >= 1000 and self.game_over(action):
+                ingame_reward = 10000
+            elif (ingame_reward - self.reward) < 1000 and (ingame_reward - self.reward) > 500 and self.game_over(action):
+                ingame_reward = 100    
+            elif (ingame_reward - self.reward) < 500 and (ingame_reward - self.reward) > 0 and self.game_over(action):
+                ingame_reward = 1
+            elif (ingame_reward - self.reward) == 0 and self.game_over(action):
+                ingame_reward = -100
+            else:
+                ingame_reward = 0    
+            self.reward = temp_reward
+        except Exception as e:
+            ingame_reward = 0
+            pass
+        return ingame_reward
+            
 
     def act(self, action):
         # [ shoot_low, shoot_high, left_arrow, right_arrow ]
@@ -61,7 +109,9 @@ class FIFA(object):
         else:
             time.sleep(1)
 
-        return self.observe()
+        ingame_reward = self.calculate_rewards(action)
+        is_game_over = self.game_over(action)      
+        return self.observe(), ingame_reward, is_game_over
 
     def reset(self):
         return
