@@ -50,29 +50,28 @@ def control_bot(game,epochs, model):
                 input_tm1 = input_t
 
                 if np.random.rand() <= epsilon:
-                    # Eat something random from the menu
                     action = int(np.random.randint(0, num_actions, size=1))
-                # else:
-                #     print(input_tm1.shape)
-                #     q = model.predict(input_tm1)
-                #     print(q.shape)
-                #     action = np.argmax(q[0])
-                #     print(q[0])
-                # print(action)
+                else:
+                    print(input_tm1.shape)
+                    q = model.predict(input_tm1)
+                    print(q.shape)
+                    action = np.argmax(q[0])
+                    print(q[0])
+                print(action)
                 input_t, reward, game_over = game.act(action)
                 print("reward calculated - " + str(reward)) 
 
-                # print("inside FIFA",input_tm1.shape,action,reward,input_t.shape)
-                # exp_replay.remember([input_tm1, action, reward, input_t], game_over)
+                print("inside FIFA",input_tm1.shape,action,reward,input_t.shape)
+                exp_replay.remember([input_tm1, action, reward, input_t], game_over)
 
-                # # Load batch of experiences
-                # inputs, targets = exp_replay.get_batch(model, batch_size=1)
+                # Load batch of experiences
+                inputs, targets = exp_replay.get_batch(model, batch_size=1)
 
-                # # train model on experiences
-                # batch_loss = model.train_on_batch(inputs, targets)
+                # train model on experiences
+                batch_loss = model.train_on_batch(inputs, targets)
 
-                # # print(loss)
-                # loss += batch_loss
+                # print(loss)
+                loss += batch_loss
             keys = key_check()
             if 'P' in keys:
                 if paused:
