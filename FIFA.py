@@ -58,10 +58,17 @@ class FIFA(object):
         
 
     def crop_image(self, image, start_x,start_y, crop_x, crop_y):
-            crop_img = image[start_y:start_y + crop_y, start_x:start_x+crop_x]
-            return crop_img
+        crop_img = image[start_y:start_y + crop_y, start_x:start_x+crop_x]
+        return crop_img
 
     def get_reward_by_ocr(self, reward_screen, action):
+
+
+        # In fifa 18, we give rewards based on player's freekick score after every shoot. 
+        # Ideally, it give 1000 or more than 1000 when it hits one of the four targets.
+        # It gives approximate 800 - 999 if it hits near target.
+        # it gives 500- 700 if player just scores no where near target.
+        # it gives 200 if the shot hits the goal post.
         ingame_reward = 0
         i = Image.fromarray(reward_screen.astype('uint8'), 'RGB')
         ocr_result = pt.image_to_string(i)

@@ -3,20 +3,21 @@ import pytesseract as pt
 from keras.layers.core import Dense
 from keras.models import Sequential
 from keras.models import model_from_json
+from keras.layers import Flatten
 from keras.optimizers import sgd
 from matplotlib import pyplot as plt
-
 from FIFA import FIFA
 from train import control_bot
-
+from keras.layers import Flatten
 
 def baseline_model(grid_size, num_actions, hidden_size):
     # setting up the model with keras
     model = Sequential()
-    model.add(Dense(hidden_size, input_shape=(grid_size,), activation='relu'))
-    model.add(Dense(hidden_size, activation='relu'))
-    model.add(Dense(num_actions))
-    model.compile(sgd(lr=.01), "mse")
+    model.add(Flatten())
+    model.add(Dense(512,activation='relu'))
+    model.add(Dense(256, activation='relu'))
+    model.add(Dense(4))
+    model.compile(sgd(lr=.01),loss="mse")
     return model
 
 
@@ -34,7 +35,7 @@ def load_model():
 
 
 model = baseline_model(grid_size=128, num_actions=4, hidden_size=512)
-#model = load_model()
+# model = load_model()
 # model.summary()
 
 game = FIFA()

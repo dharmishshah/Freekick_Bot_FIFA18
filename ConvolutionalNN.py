@@ -17,4 +17,6 @@ def get_image_content(image):
 	img_data = preprocess_input(image)
 	vgg16_feature = model.predict(img_data)
 	return vgg16_feature
+
+	 
 	
