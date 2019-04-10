@@ -3,9 +3,16 @@ import os
 
 
 class ExperienceReplay(object):
+<<<<<<< HEAD
 
     def __init__(self, max_memory=100000, discount=.9):
 
+=======
+ 
+
+    def __init__(self, max_memory=100000, discount=.9):
+        
+>>>>>>> d45d4751b47b57108bf1884335bc5b1531a2d3c6
         self.max_memory = max_memory
         self.memory = list()
         self.discount = discount
@@ -19,18 +26,13 @@ class ExperienceReplay(object):
 
     def get_batch(self, model, batch_size=10):
 
-        # How many experiences do we have?
         len_memory = len(self.memory)
-
         # Calculate the number of actions that can possibly be taken in the game( we are considering 4 actions)
+
         num_actions = model.output_shape[-1]
-        # Dimensions of the game field
         env_dim = self.memory[0][0][0].shape[1]
-        # We want to return an input and target vector with inputs from an observed state...
         inputs = np.zeros((min(len_memory, batch_size), 7,7,512))
-        # ...and the target r + gamma * max Q(s’,a’)
-        # Note that our target is a matrix, with possible fields not only for the action taken but also
-        # for the other possible actions. The actions not take the same value as the prediction to not affect them
+       
         targets = np.zeros((inputs.shape[0], num_actions))
 
         
