@@ -17,6 +17,8 @@ We trained it for various amounts of time and were getting somewhat okay results
 
 We are focusing on our experience replay technique right now. We are currently storing a large amount of previous screens in order to store and explain the model temporal relation between frames and Q score. We want to experiment on LSTMs as opposed to this memory consuming Experience Replay logic that is generally used in Deep Q Learning.
 
+We have attached youtube video links showcasing training of free kick bot which can be found under youtube video links folder. We have also attached reward screenshots generated after freekick is taken by bot under screenshots folder.
+
 
 
 
