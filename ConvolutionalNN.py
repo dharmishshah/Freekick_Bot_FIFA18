@@ -10,7 +10,7 @@ import numpy as np
 
 model = VGG16(weights='imagenet', include_top=False)	
 
-
+# getting pre processed vgg 16 image features
 def get_image_content(image):
 	image = cv2.resize(image,dsize = (224,224),interpolation = cv2.INTER_CUBIC)
 	image = np.expand_dims(image,axis=0)

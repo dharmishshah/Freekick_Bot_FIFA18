@@ -6,10 +6,6 @@ from grabscreen import grab_screen
 from directkeys import *
 import ConvolutionalNN as cnn
 
-
-
-#Game class that performs the action grabs screen and restarts the drill.
-
 count = 0
 
 class FIFA(object):
@@ -23,15 +19,13 @@ class FIFA(object):
         is_over = True if action in [0, 1] else False
         return is_over    
 
-
-    #observes the game state if the drill is finished the retry button is pressed.
     def observe(self):
         print('\n\nobserve')
-        # get current state s from screen using screen-grab
+        # get current screen using screen-grab
         screen = grab_screen(region=None)
         screen = screen
 
-        # if drill over, restart drill and take screenshot again
+        # if freekick drill is over, then restart drill
         restart_button = screen
         i = Image.fromarray(restart_button.astype('uint8'), 'RGB')
         restart_text = pt.image_to_string(i)
@@ -51,18 +45,18 @@ class FIFA(object):
         state = cnn.get_image_content(screen)
         return state
 
+    # calculating rewards by grabbing screen and cropping only drill points        
     def calculate_rewards(self,action):
         screen = grab_screen(region=None)
         crop_img = self.crop_image(screen, 1125, 40, 65, 55)
         return self.get_reward_by_ocr(crop_img,action) 
         
-
+    # cropping image by start x and start y with width and height    
     def crop_image(self, image, start_x,start_y, crop_x, crop_y):
         crop_img = image[start_y:start_y + crop_y, start_x:start_x+crop_x]
         return crop_img
 
     def get_reward_by_ocr(self, reward_screen, action):
-
 
         # In fifa 18, we give rewards based on player's freekick score after every shoot. 
         # Ideally, it give 1000 or more than 1000 when it hits one of the four targets.
@@ -97,7 +91,6 @@ class FIFA(object):
             
 
     def act(self, action):
-        # [ shoot_low, shoot_high, left_arrow, right_arrow ]
         display_action = ['shoot_low', 'shoot_high', 'left_arrow', 'right_arrow']
         print('action: ' + str(display_action[action]))
 
@@ -110,7 +103,7 @@ class FIFA(object):
         for key in keys_to_press[action]:
             ReleaseKey(key)
 
-        # wait until some time after taking action
+        # wait until some time after taking action for more power and variations in shots
         if action in [0, 1]:
             time.sleep(5)
         else:

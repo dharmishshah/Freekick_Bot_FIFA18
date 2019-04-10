@@ -34,20 +34,16 @@ def load_model():
     return loaded_model
 
 
-model = baseline_model(grid_size=128, num_actions=4, hidden_size=512)
-# model = load_model()
+# model = baseline_model(grid_size=128, num_actions=4, hidden_size=512)
+model = load_model()
 # model.summary()
 
 game = FIFA()
-epoch = 1000  # Number of games played in training, I found the model needs about 4,000 games till it plays well
+# Number of games played in training, I found the model needs about 4,000 games till it plays well
+epoch = 1000  
 train_mode = 1
 
 if train_mode == 1:
-    # Train the model
+    # Training the model
     hist = control_bot(game,epoch, model)
     print("Training done")
-else:
-    # Test the model
-    print("TO DO testing the training data")
-
-print(hist)
