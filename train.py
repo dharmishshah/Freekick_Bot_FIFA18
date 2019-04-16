@@ -41,6 +41,7 @@ def control_bot(game,epochs, model):
         game_over = False
         # get tensorflow running first to acquire cudnn handle
         input_t = game.observe()
+
         if e == 0:
             paused = True
             print('Training is paused. Press p once game is loaded and is ready to be played.')
