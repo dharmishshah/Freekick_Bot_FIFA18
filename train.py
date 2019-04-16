@@ -3,6 +3,9 @@ import time
 from getkeys import key_check
 from FIFA import FIFA
 from experience_replay import ExperienceReplay
+import random 
+
+
 
 paused = True
 
@@ -32,12 +35,13 @@ def control_bot(game,epochs, model):
     # Epochs is the number of games we play
     for e in range(epochs):
         # epsilon = 4 / ((e + 1) ** (1 / 2))
-        epsilon = 0.9
+        epsilon = 0.1
         # Resetting the game
         game.reset()
         game_over = False
         # get tensorflow running first to acquire cudnn handle
         input_t = game.observe()
+
         if e == 0:
             paused = True
             print('Training is paused. Press p once game is loaded and is ready to be played.')
@@ -47,26 +51,25 @@ def control_bot(game,epochs, model):
             if not paused:
                 # The learner is acting on the last observed game screen
                 # input_t is a vector containing representing the game screen
-                input_tm1 = input_t
+                input_tm1 = input_t #shape output of VGG feature extractor (1,7,7,512)
 
-                if np.random.rand() <= epsilon:
+                if random.choice([1,2,3,4,5,6,7,8,9,10]) in [1,5,10]:
+                    print("inside random")
                     action = int(np.random.randint(0, num_actions, size=1))
                 else:
-                    print(input_tm1.shape)
+                    print("inside predict")
                     q = model.predict(input_tm1)
                     print(q.shape)
                     action = np.argmax(q[0])
                     print(q[0])
-                print(action)
                 input_t, reward, game_over = game.act(action)
                 print("reward calculated - " + str(reward)) 
 
-                print("inside FIFA",input_tm1.shape,action,reward,input_t.shape)
                 exp_replay.remember([input_tm1, action, reward, input_t], game_over)
 
                 # Load batch of experiences
-                inputs, targets = exp_replay.get_batch(model, batch_size=1)
-
+                inputs, targets = exp_replay.get_batch(model, batch_size=8)
+                print(targets)
                 # train model on experiences
                 batch_loss = model.train_on_batch(inputs, targets)
 

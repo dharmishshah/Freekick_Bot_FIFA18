@@ -5,6 +5,7 @@ from PIL import Image
 from grabscreen import grab_screen
 from directkeys import *
 import ConvolutionalNN as cnn
+import random
 
 count = 0
 
@@ -13,7 +14,7 @@ class FIFA(object):
 
     def __init__(self):
         self.reset()
-
+        self.hist = []
 
     def game_over(self, action):
         is_over = True if action in [0, 1] else False
@@ -29,10 +30,21 @@ class FIFA(object):
         restart_button = screen
         i = Image.fromarray(restart_button.astype('uint8'), 'RGB')
         restart_text = pt.image_to_string(i)
+               
+
         if "RETRV DRILL" in restart_text:
+            self.reward = self.get_final_drill_score()
+            if self.reward != 0:
+                file = open("model_epoch1000/history.txt","a")
+                file.write(str(self.reward))
+                file.write("\n")
+                file.close()
             # press enter key
             print('pressing enter, reset reward')
             self.reward = 0
+            PressKey(leftarrow)
+            time.sleep(0.4)
+            ReleaseKey(leftarrow)
             PressKey(leftarrow)
             time.sleep(0.4)
             ReleaseKey(leftarrow)
@@ -44,6 +56,22 @@ class FIFA(object):
             screen = screen
         state = cnn.get_image_content(screen)
         return state
+
+    def get_final_drill_score(self):
+        screen = grab_screen(region=None)
+        crop_img = self.crop_image(screen, 550, 235, 50, 50)
+        i = Image.fromarray(crop_img.astype('uint8'), 'RGB')
+        ocr_result = pt.image_to_string(i)
+        print(str(ocr_result))
+        try:
+            ingame_reward = int(''.join(c for c in ocr_result if c.isdigit()))
+            if self.reward < ingame_reward:
+                self.reward = ingame_reward
+            print("drill final score - " + str(self.reward))
+        except Exception as e:
+            print(e)
+            pass
+        return self.reward                
 
     # calculating rewards by grabbing screen and cropping only drill points        
     def calculate_rewards(self,action):
@@ -72,20 +100,24 @@ class FIFA(object):
                    raise Exception("invalid score")
             ingame_reward = int(''.join(c for c in ocr_result if c.isdigit()))
             temp_reward = ingame_reward
-            print("ingame_reward - " + str(ingame_reward) + " reward - " + str(self.reward))
+            print("ingame_reward - " + str(ingame_reward) + " reward - " + str(self.reward) + " action - " + str(action))
             if (ingame_reward - self.reward) >= 1000 and self.game_over(action):
-                ingame_reward = 10000
+                ingame_reward = 5
             elif (ingame_reward - self.reward) < 1000 and (ingame_reward - self.reward) > 500 and self.game_over(action):
-                ingame_reward = 100    
+                ingame_reward = 1    
             elif (ingame_reward - self.reward) < 500 and (ingame_reward - self.reward) > 0 and self.game_over(action):
                 ingame_reward = 1
             elif (ingame_reward - self.reward) == 0 and self.game_over(action):
-                ingame_reward = -100
+                ingame_reward = -10
             else:
                 ingame_reward = 0    
             self.reward = temp_reward
         except Exception as e:
-            ingame_reward = 0
+            print(e)
+            reward_list = [0.5, -0.5]
+            value = random.choice(reward_list)
+            print(str(value))
+            ingame_reward = value
             pass
         return ingame_reward
             
