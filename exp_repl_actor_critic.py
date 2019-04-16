@@ -4,7 +4,7 @@ import math
 
 class ExperienceReplay(object):
 
-    def __init__(self, max_memory=1000, discount=.9):
+    def __init__(self, max_memory=1000, discount=.3):
         
         self.max_memory = max_memory
         self.memory = list()
