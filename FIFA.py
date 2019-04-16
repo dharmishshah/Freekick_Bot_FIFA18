@@ -56,7 +56,7 @@ class FIFA(object):
             screen = screen
             self.hist.append(self.reward)
             if len(self.hist) > 50:
-                file = open("model_epoch1000/history.txt","w")
+                file = open("model_epoch1000/history.txt","a")
                 file.write(str(self.hist))
                 self.hist = []
         state = cnn.get_image_content(screen)
