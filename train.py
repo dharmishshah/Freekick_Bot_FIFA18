@@ -68,7 +68,7 @@ def control_bot(game,epochs, model):
                 exp_replay.remember([input_tm1, action, reward, input_t], game_over)
 
                 # Load batch of experiences
-                inputs, targets = exp_replay.get_batch(model, batch_size=8)
+                inputs, targets = exp_replay.get_batch(model, batch_size=32)
                 print(targets)
                 # train model on experiences
                 batch_loss = model.train_on_batch(inputs, targets)
