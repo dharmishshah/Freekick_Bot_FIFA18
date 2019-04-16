@@ -1,18 +1,11 @@
 import numpy as np
 import os
-
+import math
 
 class ExperienceReplay(object):
-<<<<<<< HEAD
 
-    def __init__(self, max_memory=100000, discount=.9):
-
-=======
- 
-
-    def __init__(self, max_memory=100000, discount=.9):
+    def __init__(self, max_memory=1000, discount=.3):
         
->>>>>>> d45d4751b47b57108bf1884335bc5b1531a2d3c6
         self.max_memory = max_memory
         self.memory = list()
         self.discount = discount
@@ -29,7 +22,7 @@ class ExperienceReplay(object):
         len_memory = len(self.memory)
         # Calculate the number of actions that can possibly be taken in the game( we are considering 4 actions)
 
-        num_actions = model.output_shape[-1]
+        num_actions = 4
         env_dim = self.memory[0][0][0].shape[1]
         inputs = np.zeros((min(len_memory, batch_size), 7,7,512))
        
@@ -59,9 +52,21 @@ class ExperienceReplay(object):
             Q_sa = np.max(model.predict(state_tp1)[0])
 
             # if the game ended, the reward is the final reward
-            if game_over:  # if game_over is True
-                targets[i, action_t] = reward_t
-            else:
-                # r + gamma * max Q(s’,a’)
+            if game_over and reward_t != 0:
+                targets[i,action_t] = reward_t
+            elif not game_over:
                 targets[i, action_t] = reward_t + self.discount * Q_sa
+            else:
+                targets[i] = targets[i]
+            # if game_over or reward_t > 0:  # if game_over is True
+            #     print("game_over")
+            #     targets[i, action_t] = targets[i,action_t]
+            # elif not game_over:
+            #     print("game not over")
+            #     # r + gamma * max Q(s’,a’)
+            #     targets[i, action_t] = reward_t + self.discount * Q_sa
+            # else:
+            #     print("inside targets")
+            #     targets[i] = targets[i]
+        
         return inputs, targets

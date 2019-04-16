@@ -5,6 +5,7 @@ from PIL import Image
 from grabscreen import grab_screen
 from directkeys import *
 import ConvolutionalNN as cnn
+import random
 
 count = 0
 
@@ -13,7 +14,7 @@ class FIFA(object):
 
     def __init__(self):
         self.reset()
-
+        self.hist = []
 
     def game_over(self, action):
         is_over = True if action in [0, 1] else False
@@ -36,12 +37,20 @@ class FIFA(object):
             PressKey(leftarrow)
             time.sleep(0.4)
             ReleaseKey(leftarrow)
+            PressKey(leftarrow)
+            time.sleep(0.4)
+            ReleaseKey(leftarrow)
             PressKey(enter)
             time.sleep(0.4)
             ReleaseKey(enter)
             time.sleep(2)
             screen = grab_screen(region=None)
             screen = screen
+            self.hist.append(self.reward)
+            if len(self.hist) > 50:
+                file = open("model_epoch1000/history.txt","w")
+                file.write(str(self.hist))
+                self.hist = []
         state = cnn.get_image_content(screen)
         return state
 
@@ -72,20 +81,24 @@ class FIFA(object):
                    raise Exception("invalid score")
             ingame_reward = int(''.join(c for c in ocr_result if c.isdigit()))
             temp_reward = ingame_reward
-            print("ingame_reward - " + str(ingame_reward) + " reward - " + str(self.reward))
+            print("ingame_reward - " + str(ingame_reward) + " reward - " + str(self.reward) + " action - " + str(action))
             if (ingame_reward - self.reward) >= 1000 and self.game_over(action):
-                ingame_reward = 10000
+                ingame_reward = 5
             elif (ingame_reward - self.reward) < 1000 and (ingame_reward - self.reward) > 500 and self.game_over(action):
-                ingame_reward = 100    
+                ingame_reward = 1    
             elif (ingame_reward - self.reward) < 500 and (ingame_reward - self.reward) > 0 and self.game_over(action):
                 ingame_reward = 1
             elif (ingame_reward - self.reward) == 0 and self.game_over(action):
-                ingame_reward = -100
+                ingame_reward = -10
             else:
                 ingame_reward = 0    
             self.reward = temp_reward
         except Exception as e:
-            ingame_reward = 0
+            print(e)
+            reward_list = [0.5, -0.5]
+            value = random.choice(reward_list)
+            print(str(value))
+            ingame_reward = value
             pass
         return ingame_reward
             
