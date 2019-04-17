@@ -27,22 +27,11 @@ def baseline_model():
 
 
 def load_model():
-    # load json and create model
-    # json_file = open('model_epoch1000/model.json', 'r')
-    # loaded_model_json = json_file.read()
-    # json_file.close()
-    # loaded_model = model_from_json(loaded_model_json)
-    # # load weights into new model
-    # loaded_model.load_weights("model_epoch1000/model.h5")
-    # print("Loaded model from disk")
     loaded_model = baseline_model()
-    # loaded_model.compile(loss='mse', optimizer='sgd')
     return loaded_model
 
 
-# model = baseline_model(grid_size=128, num_actions=4, hidden_size=512)
-# model = load_model()
-# model.summary()
+
 
 game = FIFA()
 # Number of games played in training, I found the model needs about 4,000 games till it plays well
