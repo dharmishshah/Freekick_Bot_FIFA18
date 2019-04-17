@@ -23,19 +23,13 @@ class Train(object):
         self.gamma = .95
         self.tau   = .125
         self.exp_replay = ExperienceReplay()
-        # ===================================================================== #
-        #                               Actor Model                             #
-        # Chain rule: find the gradient of chaging the actor network params in  #
-        # getting closest to the final value network predictions, i.e. de/dA    #
-        # Calculate de/dA as = de/dC * dC/dA, where e is error, C critic, A act #
-        # ===================================================================== #
+        #Actor Model
 
-        # self.memory = deque(maxlen=2000)
         self.actor_state_input, self.actor_model = self.create_actor_model()
         _, self.target_actor_model = self.create_actor_model()
 
         self.actor_critic_grad = tf.placeholder(tf.float32, 
-            [None, 4]) # where we will feed de/dC (from critic)
+            [None, 4]) 
         
         actor_model_weights = self.actor_model.trainable_weights
         self.actor_grads = tf.gradients(self.actor_model.output, 
@@ -43,9 +37,7 @@ class Train(object):
         grads = zip(self.actor_grads, actor_model_weights)
         self.optimize = tf.train.AdamOptimizer(self.learning_rate).apply_gradients(grads)
 
-        # ===================================================================== #
-        #                              Critic Model                             #
-        # ===================================================================== #       
+        #Critic model     
 
         self.critic_state_input, self.critic_action_input, \
             self.critic_model = self.create_critic_model()
@@ -57,9 +49,7 @@ class Train(object):
         # Initialize for later gradient calculations
         self.sess.run(tf.initialize_all_variables())
 
-    # ========================================================================= #
-    #                              Model Definitions                            #
-    # ========================================================================= #
+    
 
     def create_actor_model(self):
         state_input = Input(shape=(7,7,512))
@@ -169,7 +159,7 @@ class Train(object):
                         # The learner is acting on the last observed game screen
                         # input_t is a vector containing representing the game screen
                         input_tm1 = input_t #shape output of VGG feature extractor (1,7,7,512)
-
+                        #take a random action
                         if random.choice([1,2,3,4,5,6,7,8,9,10]) in [1,5,10]:
                             print("inside random")
                             cou+=1
@@ -189,9 +179,7 @@ class Train(object):
                         # Load batch of experiences
                         inputs = self.exp_replay.get_batch(batch_size=4)
                       
-                        # # train model on experiences
                         self.train_actor_critic(inputs)
-                        # print(loss)
                     keys = key_check()
                     if 'P' in keys:
                         if paused:
@@ -206,4 +194,3 @@ class Train(object):
                         print('Quitting!')
                         return
 
-                win_hist.append(win_cnt)
