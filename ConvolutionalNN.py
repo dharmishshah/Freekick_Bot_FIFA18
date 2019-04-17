@@ -15,8 +15,7 @@ model = VGG16(weights='imagenet', include_top=False)
 def get_image_content(image):
 	with tf.Session().as_default() as sess:
 		sess.run(tf.global_variables_initializer())
-		image = cv2.resize(image,dsize = (224,224),interpolation = cv2.INTER_CUBIC)
-		image = np.expand_dims(image,axis=0)
+		image = np.expand_dims(cv2.resize(image,dsize = (224,224),interpolation = cv2.INTER_NEAREST),axis=0)
 		img_data = preprocess_input(image)
 		vgg16_feature = model.predict(img_data)
 		return vgg16_feature
