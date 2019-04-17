@@ -9,19 +9,12 @@ import time
 SendInput = ctypes.windll.user32.SendInput
 
 # http://geck.bethsoft.com/index.php?title=Template:DirectX_Scancodes
-W = 0x11
-Q = 0x10
-F = 0x21
 spacebar = 0x39
 leftarrow = 0xcb
 rightarrow = 0xcd
 uparrow = 0xc8
 downarrow = 0xd0
 enter = 0x1c
-U = 0x16
-J = 0x24
-H = 0x23
-L = 0x26
 E = 0x12
 D = 0x20
 A = 0x1E
@@ -35,21 +28,6 @@ PUL = ctypes.POINTER(ctypes.c_ulong)
 class KeyBdInput(ctypes.Structure):
     _fields_ = [("wVk", ctypes.c_ushort),
                 ("wScan", ctypes.c_ushort),
-                ("dwFlags", ctypes.c_ulong),
-                ("time", ctypes.c_ulong),
-                ("dwExtraInfo", PUL)]
-
-
-class HardwareInput(ctypes.Structure):
-    _fields_ = [("uMsg", ctypes.c_ulong),
-                ("wParamL", ctypes.c_short),
-                ("wParamH", ctypes.c_ushort)]
-
-
-class MouseInput(ctypes.Structure):
-    _fields_ = [("dx", ctypes.c_long),
-                ("dy", ctypes.c_long),
-                ("mouseData", ctypes.c_ulong),
                 ("dwFlags", ctypes.c_ulong),
                 ("time", ctypes.c_ulong),
                 ("dwExtraInfo", PUL)]
